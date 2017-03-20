@@ -38,16 +38,3 @@ int inputData(int *days, int *deposit)
     }
     return 1;
 }
-
-int main()
-{
-    int days, deposit;
-    if (!inputData(&days, &deposit)) {
-        return 1;    
-    }
-    
-    float income = deposit * getPercentOfInc(days, deposit);
-    printf("Income: %.2f\n", income);  
-   
-    return 0;
-}
