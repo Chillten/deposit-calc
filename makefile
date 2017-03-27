@@ -1,26 +1,45 @@
 CFLAG = -Wall -Werror
 SRC = src
+SRCTEST = test
 BIN = bin
-BUILD = build
+BUILD = build/src
+BUILDTEST = build/test
 TARGET   = deposit-calc
+SIMPlEUTEST = simple-utest
+CC = gcc
+TESTCOMPILE = -I thirdparty -I $(SRC)
 
 
 SOURCES  := $(wildcard $(SRC)/*.c)
+SOURCESTEST  := $(wildcard $(SRCTEST)/*.c)
 INCLUDES := $(wildcard $(SRC)/*.h)
 OBJECTS  := $(SOURCES:$(SRC)/%.c=$(BUILD)/%.o)
+OBJECTSTEST  := $(SOURCESTEST:$(SRCTEST)/%.c=$(BUILDTEST)/%.o)
 rm       = rm -f
 
+
 $(BIN)/$(TARGET): $(OBJECTS)
-	@gcc $(CFLAGS) -o $@ $(OBJECTS)
+	@$(CC) $(CFLAGS) -o $@ $(OBJECTS)
 	@echo "Linking complete!"
 
 $(OBJECTS): $(BUILD)/%.o : $(SRC)/%.c
-	@gcc $(CFLAGS) -c $< -o $@
+	@$(CC) $(CFLAGS) -c $< -o $@
 	@echo "Compiled "$<" successfully!"
+
+simple-test: $(BIN)/$(SIMPlEUTEST)
+	@echo "Compiled simple-test "$<" successfully!"
+
+$(BIN)/$(SIMPlEUTEST): $(BUILDTEST)/main.o
+	$(CC) $(TESTCOMPILE) $(CFLAGS) $(BUILDTEST)/main.o -o $@
+
+$(OBJECTSTEST): $(BUILDTEST)/%.o : $(SRCTEST)/%.c
+	@$(CC) $(CFLAGS) -c $< -o $@
+	@echo "Compiled test "$<" successfully!"
 
 .PHONY: clean
 clean:
-	@$(rm) $(OBJECTS)
+	$(rm) $(OBJECTS)
+	$(rm) $(OBJECTSTEST)
 	@echo "Cleanup complete!"
 
 .PHONY: remove
