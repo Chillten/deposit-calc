@@ -41,14 +41,14 @@ $(OBJECTSTEST): $(BUILDTEST)/%.o : $(SRCTEST)/%.c
 	@$(CC) $(TESTFLAG) $(CFLAGS) -c $< -o $@
 	@echo "Compiled test "$<" successfully!"
 
-.PHONY: test
-test:$(OBJECTSTEST) $(OBJECTS)
+.PHONY: build_test
+build_test:$(OBJECTSTEST) $(OBJECTS)
 	@$(CC) $(TESTFLAG) $(BUILDTEST)/main.o -o $(BIN)/$(SIMPlEUTEST)
 	@$(CC) $(TESTFLAG) $(BUILD)/deposit.o $(BUILDTEST)/validation_test.o -o $(BIN)/$(VALIDUTEST)
 	@$(CC) $(TESTFLAG) $(BUILD)/deposit.o $(BUILDTEST)/deposit_test.o -o $(BIN)/$(DEPOSITTEST)
 
 .PHONY: run_test
-run_test:test
+run_test:build_test
 	./$(BIN)/$(VALIDUTEST)
 	./$(BIN)/$(DEPOSITTEST)
 
