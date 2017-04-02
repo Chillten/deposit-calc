@@ -1,61 +1,64 @@
+#compile
+CC = gcc
 CFLAG = -Wall -Werror
+TESTFLAG = -I thirdparty -I $(SRC) $(CFLAG)
+#folder define
 SRC = src
 SRCTEST = test
 BIN = bin
 BUILD = build/src
 BUILDTEST = build/test
+DIRGUARD=@mkdir -p $(@D)
+#target
 TARGET   = deposit-calc
 SIMPlEUTEST = simple-utest
-CC = gcc
-TESTCOMPILE = -I thirdparty -I $(SRC)
-
-
+VALIDUTEST = validation_test
+DEPOSITTEST = deposit_test
+#sources
 SOURCES  := $(wildcard $(SRC)/*.c)
 SOURCESTEST  := $(wildcard $(SRCTEST)/*.c)
-INCLUDES := $(wildcard $(SRC)/*.h)
+#INCLUDES := $(wildcard $(SRC)/*.h)
+#objects
 OBJECTS  := $(SOURCES:$(SRC)/%.c=$(BUILD)/%.o)
 OBJECTSTEST  := $(SOURCESTEST:$(SRCTEST)/%.c=$(BUILDTEST)/%.o)
+
 rm       = rm -f
 
-
+#deposit-calc
 $(BIN)/$(TARGET): $(OBJECTS)
 	@$(CC) $(CFLAGS) -o $@ $(OBJECTS)
 	@echo "Linking complete!"
 
+#deposit-calc objects
 $(OBJECTS): $(BUILD)/%.o : $(SRC)/%.c
+	@$(DIRGUARD)
 	@$(CC) $(CFLAGS) -c $< -o $@
 	@echo "Compiled "$<" successfully!"
 
-simple-test: $(BIN)/$(SIMPlEUTEST)
-	@echo "Compiled simple-test "$<" successfully!"
-
-$(BIN)/$(SIMPlEUTEST): $(BUILDTEST)/main.o
-	$(CC) $(TESTCOMPILE) $(CFLAGS) $(BUILDTEST)/main.o -o $@
-
+#test objects
 $(OBJECTSTEST): $(BUILDTEST)/%.o : $(SRCTEST)/%.c
-	@$(CC) $(CFLAGS) -c $< -o $@
+	@$(DIRGUARD)
+	@$(CC) $(TESTFLAG) $(CFLAGS) -c $< -o $@
 	@echo "Compiled test "$<" successfully!"
+
+.PHONY: test
+test:$(OBJECTSTEST) $(OBJECTS)
+	@$(CC) $(TESTFLAG) $(BUILDTEST)/main.o -o $(BIN)/$(SIMPlEUTEST)
+	@$(CC) $(TESTFLAG) $(BUILD)/deposit.o $(BUILDTEST)/validation_test.o -o $(BIN)/$(VALIDUTEST)
+	@$(CC) $(TESTFLAG) $(BUILD)/deposit.o $(BUILDTEST)/deposit_test.o -o $(BIN)/$(DEPOSITTEST)
+
+.PHONY: run_test
+run_test:test
+	./$(BIN)/$(VALIDUTEST)
+	./$(BIN)/$(DEPOSITTEST)
 
 .PHONY: clean
 clean:
-	$(rm) $(OBJECTS)
-	$(rm) $(OBJECTSTEST)
+	@$(rm) $(OBJECTS)
+	@$(rm) $(OBJECTSTEST)
 	@echo "Cleanup complete!"
 
 .PHONY: remove
 remove: clean
-	@$(rm) $(BIN)/$(TARGET)
+	@$(rm) $(BIN)/*
 	@echo "Executable removed!"
-
-#main: main.o deposit.o
-#	gcc $(CFLAG) -o $(BIN)/main $(BUILD)/main.o $(BUILD)/deposit.o
-#
-#main.o: $(SRC)/main.c
-#	gcc $(CFLAG) -o $(BUILD)/main.o -c $(SRC)/main.c
-#
-#deposit.o: $(SRC)/deposit.c
-#	gcc $(CFLAG) -o $(BUILD)/deposit.o -c $(SRC)/deposit.c
-#
-#clean: 
-#	rm -f $(BUILD)/*
-#	rm -f $(BIN)/*
