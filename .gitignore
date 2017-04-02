@@ -2,4 +2,6 @@
 */.*.swp
 */*~
 */#*#
-bin/main
+bin
+build
+
