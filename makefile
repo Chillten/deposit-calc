@@ -1,6 +1,6 @@
 #compile
 CC = gcc
-CFLAG = -Wall -Werror
+CFLAG = -Wall -Werror -std=gnu99
 TESTFLAG = -I thirdparty -I $(SRC) $(CFLAG)
 #folder define
 SRC = src
@@ -26,6 +26,7 @@ rm       = rm -f
 
 #deposit-calc
 $(BIN)/$(TARGET): $(OBJECTS)
+	@$(DIRGUARD)
 	@$(CC) $(CFLAGS) -o $@ $(OBJECTS)
 	@echo "Linking complete!"
 
@@ -43,6 +44,7 @@ $(OBJECTSTEST): $(BUILDTEST)/%.o : $(SRCTEST)/%.c
 
 .PHONY: build_test
 build_test:$(OBJECTSTEST) $(OBJECTS)
+	@mkdir -p bin
 	@$(CC) $(TESTFLAG) $(BUILDTEST)/main.o -o $(BIN)/$(SIMPlEUTEST)
 	@$(CC) $(TESTFLAG) $(BUILD)/deposit.o $(BUILDTEST)/validation_test.o -o $(BIN)/$(VALIDUTEST)
 	@$(CC) $(TESTFLAG) $(BUILD)/deposit.o $(BUILDTEST)/deposit_test.o -o $(BIN)/$(DEPOSITTEST)
